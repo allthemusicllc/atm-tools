@@ -1,0 +1,20 @@
+[workspace]
+members = [
+    "src/*",
+]
+
+[profile.bench]
+lto = "off"
+
+[profile.release]
+# The Cargo documentation purports similar performance to "fat" LTO with faster compilation speeds
+# See: https://doc.rust-lang.org/cargo/reference/profiles.html#lto
+lto = "thin"
+panic = "abort"
+
+# Profile for maximum optimization with "fat" LTO and codegen unit of 1
+[profile.release-fat-lto]
+inherits = "release"
+codegen-units = 1
+lto = "fat"
+panic = "abort"

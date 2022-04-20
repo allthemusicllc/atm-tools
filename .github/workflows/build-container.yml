@@ -1,0 +1,92 @@
+name: Build and Push Build Container
+on:
+  pull_request:
+    branches:
+      - "build-support/docker/**"
+    types:
+      - closed
+      - opened
+      - reopened
+      - synchronize
+  schedule:
+    # once per week on Fridays at midnight
+    - cron: "0 0 * * 5"
+  workflow_call:
+    inputs:
+      push_container:
+        type: boolean
+        required: false
+        default: true
+        description: "Push build container to configured container registry"
+  workflow_dispatch:
+    inputs:
+      push_container:
+        type: boolean
+        required: false
+        default: true
+        description: "Push build container to configured container registry"
+
+jobs:
+
+  build-container:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+
+      - name: Install Docker (BuildX)
+        uses: docker/setup-buildx-action@v1
+        with:
+          install: true
+
+      - name: Login to Github Packages
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # See: https://github.com/docker/build-push-action/blob/master/docs/advanced/cache.md#local-cache
+      - name: Configure caching for Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build the build container image
+        run: |
+          ./run.sh build-base \
+              --load \
+              --cache-from type=local,src=/tmp/.buildx-cache \
+              --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+      # See: https://github.com/docker/build-push-action/issues/252
+      # and https://github.com/moby/buildkit/issues/1896
+      - name: Replace existing cache with new image layers
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+      - name: Push build container image to registry
+        # Push the build container to registry for the following events:
+        #   * Merge PR to master branch
+        #   * Workflow triggered by cron job (schedule)
+        #   * Workflow was called with push_container set to true
+        #   * Workflow was dispatched with push_container set to true
+        # See: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
+        # and https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads
+        if: |
+          "${{
+            ( startsWith(github.ref_name, 'build-support/docker') && github.event.pull_request.base.ref == 'master' )
+            || github.event_name == 'schedule'
+            || inputs.push_container
+            || github.event.inputs.push_container
+          }}"
+        run: |
+          ./run.sh push-base

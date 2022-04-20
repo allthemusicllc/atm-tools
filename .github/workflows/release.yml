@@ -1,0 +1,120 @@
+# Inspiration taken from three primary sources:
+#   1. The ripgrep repository release workflow
+#     * https://github.com/BurntSushi/ripgrep/blob/master/.github/workflows/release.yml
+#   2. Article on automated multi-platform releases in GitHub Actions linked to in ripgrep workflow file
+#     * https://eugene-babichenko.github.io/blog/2020/05/09/github-actions-cross-platform-auto-releases/
+#   3. The cargo-deny release workflow file
+#     * https://github.com/EmbarkStudios/cargo-deny/blob/main/.github/workflows/ci.yaml
+name: Compile Release Binaries and Create New Release
+on:
+  push:
+    tags:
+      # Triggered on creation of tags that follow semver (x.y.z) with 'v' prefix
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+
+  create-github-release:
+    name: Create GitHub release
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Create GitHub release
+        id: create-release
+        run: |
+          echo "::set-output name=release_url::$(gh release create \
+            ${{ github.ref }} --title Release ${{ github.ref }})"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+    outputs:
+      release_url: "${{ steps.create-release.outputs.release_url }}"
+
+  build-release-binaries:
+    name: Build release binaries and upload assets
+    needs: create-github-release
+    permissions:
+      contents: write
+      packages: read
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            target: aarch64-apple-darwin
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: ubuntu-latest
+            target: i686-pc-windows-gnu
+          - os: ubuntu-latest
+            target: x86_64-pc-windows-gnu
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+    runs-on: "${{ matrix.os }}"
+
+    steps:
+
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+
+      - name: Install Docker (BuildX)
+        if: "${{ matrix.os == 'ubuntu-latest' }}"
+        uses: docker/setup-buildx-action@v1
+        with:
+          install: true
+
+      - name: Login to Github Packages
+        if: "${{ matrix.os == 'ubuntu-latest' }}"
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+        # Toolchain version and components must match build-support/docker/install-rust.sh
+      - name: Install Rust toolchain
+        if: "${{ matrix.os == 'macos-latest' }}"
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: "${{ matrix.target }}"
+          profile: minimal
+          components: clippy, llvm-tools-preview, rust-src, rustfmt
+
+        # Tools installed must match build-support/docker/install-cargo-tools.sh
+      - name: Install Cargo tools
+        if: "${{ matrix.os == 'macos-latest' }}"
+        shell: bash
+        run: |
+          cargo install --locked cross
+          cargo install --locked cargo-deny
+          cargo install --locked grcov
+
+      - name: Compile the package in release mode
+        if: "${{ matrix.os == 'ubuntu-latest' }}"
+        shell: bash
+        run: |
+          ./run.sh build --target "${{ matrix.target }}" --release
+
+      - name: Compile the package in release mode
+        if: "${{ matrix.os == 'macos-latest' }}"
+        shell: bash
+        run: |
+          ./run.sh --local build --target "${{ matrix.target }}" --release
+
+      - name: Upload asset(s) to release
+        shell: bash
+        run: |
+          find "./target/${{ matrix.target }}/release" -maxdepth 1 -type f \
+            | while read FILEPATH
+            do
+              if ( [ -f "${FILEPATH}" ] && [ -x "${FILEPATH}" ] )
+              then
+                FILENAME="$(basename ${FILEPATH})"
+                TARBALL_FILENAME="${FILENAME/.exe/}-${{ matrix.target }}.tar.gz"
+                tar -C "./target/${{ matrix.target }}/release" cvzf "${TARBALL_FILENAME}" "${FILENAME}"
+                gh release upload --clobber "${{ github.ref }}" "${TARBALL_FILENAME}"
+              fi
+            done
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

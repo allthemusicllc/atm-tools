@@ -1,0 +1,12 @@
+[build.env]
+passthrough = [
+    "CARGO_INCREMENTAL",
+    "RUSTC_BOOTSTRAP",
+    "RUSTDOCFLAGS",
+    "RUSTFLAGS",
+    "RUST_BACKTRACE",
+    "RUST_LOG",
+]
+
+[target.i686-pc-windows-gnu]
+image = "ghcr.io/cross-rs/i686-pc-windows-gnu:main"

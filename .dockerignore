@@ -1,0 +1,12 @@
+# Build container Dockerfile
+build-support/docker/Dockerfile
+
+# Cargo target directory
+target/
+
+# Vim swap files
+**/*.swp
+**/*.swo
+
+# YouCompleteMe config file
+.ycm_extra_conf.py

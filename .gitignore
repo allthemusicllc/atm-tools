@@ -1,0 +1,6 @@
+# Cargo target directory
+target/
+
+# Vim swap files
+**/*.swp
+**/*.swo

@@ -1,0 +1,3 @@
+def Settings(**kwargs):
+    return {
+    }

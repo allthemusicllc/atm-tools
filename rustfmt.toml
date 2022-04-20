@@ -1,0 +1,22 @@
+# See: https://rust-lang.github.io/rustfmt/ for settings documentation
+
+# Unstable: can only be enabled on nightly
+# binop_separator = "Front"
+
+# Unstable: can only be enabled on nightly
+# blank_lines_lower_bound = 1
+# blank_lines_upper_bound = 2
+
+fn_args_layout = "Tall"
+
+match_arm_leading_pipes = "Never"
+match_block_trailing_comma = true
+
+max_width = 120
+
+reorder_imports = true
+reorder_modules = true
+
+tab_spaces = 4
+
+use_small_heuristics = "Max"
