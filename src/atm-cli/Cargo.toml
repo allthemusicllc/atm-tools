@@ -1,0 +1,20 @@
+[package]
+name = "atm"
+version = "0.3.0"
+authors = ["All The Music LLC <make.allthemusic@protonmail.com>"]
+edition = "2018"
+
+homepage = "https://allthemusic.info"
+license = "CC-BY-4.0"
+readme = "README.md"
+repository = "https://github.com/allthemusicllc/atm-tools"
+
+[dependencies]
+flate2 = "1.0.9"
+humansize = "1.1.0"
+itertools = "0.8.0"
+libatm = { path = "../libatm" }
+pbr = "1.0.1"
+structopt = "0.3.9"
+tar = "0.4.26"
+thiserror = "1.0.11"
