@@ -208,15 +208,16 @@ run-test() {
     info "Running package tests"
     cross test "${@}"
 
-    info "Generating coverage report with grcov"
-    TARGET_PLATFORM="$(echo ${@} | grep -o '\-\-target [^ ]\+' | sed 's/--target//g' | tr -d '[:space:]')"
-    if [ -z "${TARGET_PLATFORM}" ]
-    then
-        TARGET_ROOT_DIRECTORY="./target/debug"
-    else
-        TARGET_ROOT_DIRECTORY="./target/${TARGET_PLATFORM}"
-    fi
-    grcov . -s . --binary-path "${TARGET_ROOT_DIRECTORY}/" -t html --branch --ignore-not-existing -o "${TARGET_ROOT_DIRECTORY}/coverage/"
+    # TODO: Re-enable coverage report after writing unit tests
+    # info "Generating coverage report with grcov"
+    # TARGET_PLATFORM="$(echo ${@} | grep -o '\-\-target [^ ]\+' | sed 's/--target//g' | tr -d '[:space:]')"
+    # if [ -z "${TARGET_PLATFORM}" ]
+    # then
+    #     TARGET_ROOT_DIRECTORY="./target/debug"
+    # else
+    #     TARGET_ROOT_DIRECTORY="./target/${TARGET_PLATFORM}"
+    # fi
+    # grcov . -s . --binary-path "${TARGET_ROOT_DIRECTORY}/" -t html --branch --ignore-not-existing -o "${TARGET_ROOT_DIRECTORY}/coverage/"
 }
 
 run-update-deps() {
