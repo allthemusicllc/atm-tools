@@ -10,11 +10,11 @@ readme = "README.md"
 repository = "https://github.com/allthemusicllc/atm-tools"
 
 [dependencies]
-flate2 = "1.0.9"
-humansize = "1.1.0"
-itertools = "0.8.0"
+flate2 = "1.0.23"
+humansize = "1.1.1"
+itertools = "0.10.2"
 libatm = { path = "../libatm" }
-pbr = "1.0.1"
-structopt = "0.3.9"
-tar = "0.4.26"
-thiserror = "1.0.11"
+pbr = "1.0.4"
+structopt = "0.3.26"
+tar = "0.4.38"
+thiserror = "1.0.30"
