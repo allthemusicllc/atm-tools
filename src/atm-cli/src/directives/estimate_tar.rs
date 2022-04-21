@@ -16,7 +16,7 @@ use crate::cli::CliDirective;
 
 const ENTRY_SIZE: u64 = 1024;
 
-const CAVEATS: &'static str = "\
+const CAVEATS: &str = "\
 Estimate assumes underlying drive has block size of 512 bytes. Some RAID arrays \
 can have a stripe size up to 128KB (or higher), and some modern file systems have block \
 sizes of 4KB, which could affect file size. For example, if the output dataset is 3KB, \

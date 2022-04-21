@@ -96,7 +96,7 @@ where
         }
         // Generate buffer containing MIDI file data
         let data = mfile.gen_file()?;
-        self.archive.append_data(&mut header, &path, data.as_slice()).map_err(|e| TarArchiveError::IOError(e))
+        self.archive.append_data(&mut header, &path, data.as_slice()).map_err(TarArchiveError::IOError)
     }
 
     fn finish(&mut self) -> Result<(), Self::Error> {
@@ -105,7 +105,7 @@ where
             StorageState::Open => {
                 self.state = StorageState::Closed;
                 // Write footer sections to archive and close for writing
-                self.archive.finish().map_err(|e| TarArchiveError::IOError(e))
+                self.archive.finish().map_err(TarArchiveError::IOError)
             },
             _ => Ok(()),
         }
@@ -121,6 +121,6 @@ where
 
     fn into_inner(mut self) -> Result<Self::Inner, <Self as StorageBackend>::Error> {
         self.finish()?;
-        self.archive.into_inner().map_err(|e| TarArchiveError::IOError(e))
+        self.archive.into_inner().map_err(TarArchiveError::IOError)
     }
 }

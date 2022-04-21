@@ -138,9 +138,7 @@ impl BatchTarFile {
                 Some(mode) => header.set_mode(mode),
                 None => header.set_mode(644),
             }
-            self.archive
-                .append_data(&mut header, &path, raw_buffer.as_slice())
-                .map_err(|e| TarArchiveError::IOError(e))?;
+            self.archive.append_data(&mut header, &path, raw_buffer.as_slice()).map_err(TarArchiveError::IOError)?;
         }
         Ok(())
     }
@@ -161,7 +159,7 @@ impl BatchTarFile {
         if is_partition_boundary {
             self.batch_number = 0;
         } else {
-            self.batch_number = self.batch_number + 1;
+            self.batch_number += 1;
         }
         Ok(())
     }
@@ -197,7 +195,7 @@ impl StorageBackend for BatchTarFile {
 
         // Add file to batch archive and increment batch_count
         self.batch_archive.append_file(mfile, mode)?;
-        self.batch_count = self.batch_count + 1;
+        self.batch_count += 1;
         Ok(())
     }
 
@@ -209,7 +207,7 @@ impl StorageBackend for BatchTarFile {
                 self.flush_batch()?;
                 // Write footer sections to top-level archive and
                 // close for writing
-                self.archive.finish().map_err(|e| TarArchiveError::IOError(e))
+                self.archive.finish().map_err(TarArchiveError::IOError)
             },
             _ => Ok(()),
         }
@@ -221,6 +219,6 @@ impl IntoInner for BatchTarFile {
 
     fn into_inner(mut self) -> Result<Self::Inner, <Self as StorageBackend>::Error> {
         self.finish()?;
-        self.archive.into_inner().map_err(|e| TarArchiveError::IOError(e))
+        self.archive.into_inner().map_err(TarArchiveError::IOError)
     }
 }

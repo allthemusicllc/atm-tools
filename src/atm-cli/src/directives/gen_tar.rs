@@ -39,7 +39,7 @@ impl CliDirective for GenTarDirective {
                 let path_generator = crate::storage::PartitionPathGenerator::new(
                     note_set.len() as u32,
                     melody_length,
-                    self.partition_args.max_files.into(),
+                    self.partition_args.max_files,
                     partition_depth,
                 )
                 .unwrap_or_else(|err| {

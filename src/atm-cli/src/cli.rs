@@ -12,11 +12,11 @@ use std::str::FromStr;
 ***** Utility Macros *****
 *************************/
 
-macro_rules! impl_into {
+macro_rules! impl_from {
     ($struct:ty, $field:ident, $target:ty) => {
-        impl std::convert::Into<$target> for $struct {
-            fn into(self) -> $target {
-                self.$field
+        impl std::convert::From<$struct> for $target {
+            fn from(source: $struct) -> Self {
+                source.$field
             }
         }
     };
@@ -60,7 +60,7 @@ pub struct BatchSize {
     pub batch_size: u32,
 }
 
-impl_into! { BatchSize, batch_size, u32 }
+impl_from! { BatchSize, batch_size, u32 }
 
 /***********************
 ***** MelodyLength *****
@@ -81,7 +81,7 @@ pub struct MelodyLengthArg {
     pub melody_length: u32,
 }
 
-impl_into! { MelodyLengthArg, melody_length, u32 }
+impl_from! { MelodyLengthArg, melody_length, u32 }
 
 /**************************
 ***** NoteSet/NoteVec *****
@@ -94,7 +94,7 @@ pub struct NoteSetArg {
     pub note_set: libatm::MIDINoteSet,
 }
 
-impl_into! { NoteSetArg, note_set, libatm::MIDINoteSet }
+impl_from! { NoteSetArg, note_set, libatm::MIDINoteSet }
 
 #[derive(Debug, structopt::StructOpt)]
 pub struct NoteVecArg {
@@ -103,7 +103,7 @@ pub struct NoteVecArg {
     pub note_vec: libatm::MIDINoteVec,
 }
 
-impl_into! { NoteVecArg, note_vec, libatm::MIDINoteVec }
+impl_from! { NoteVecArg, note_vec, libatm::MIDINoteVec }
 
 /**********************
 ***** NumNotesArg *****
@@ -116,7 +116,7 @@ pub struct NumNotesArg {
     pub num_notes: u32,
 }
 
-impl_into! { NumNotesArg, num_notes, u32 }
+impl_from! { NumNotesArg, num_notes, u32 }
 
 /************************
 ***** PartitionArgs *****
@@ -124,7 +124,7 @@ impl_into! { NumNotesArg, num_notes, u32 }
 
 fn try_maxf_from_str(arg: &str) -> Result<u32, ParseNumberArgError> {
     let max_files = arg.parse::<u32>()?;
-    if max_files <= 0 || max_files > 4096 {
+    if max_files == 0 || max_files > 4096 {
         return Err(ParseNumberArgError::OutOfRange {
             arg_name: "Max files per directory".to_string(),
             min: "0".to_string(),
@@ -175,7 +175,7 @@ pub struct TargetArg {
     pub target: std::path::PathBuf,
 }
 
-impl_into! { TargetArg, target, std::path::PathBuf }
+impl_from! { TargetArg, target, std::path::PathBuf }
 
 /******************************
 ***** CLI Directive Trait *****

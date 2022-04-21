@@ -58,7 +58,7 @@ pub(crate) fn write_melodies_to_backend<B: StorageBackend>(
     // For each melody
     for melody_ref in crate::utils::gen_sequences(&notes, melody_length) {
         // Copy notes into owned melody
-        let melody = melody_ref.iter().map(|n| *n.clone()).collect::<libatm::MIDINoteVec>();
+        let melody = melody_ref.into_iter().copied().collect::<libatm::MIDINoteVec>();
         // Show error if adding melody to backend failed
         if let Err(err) = backend.append_melody(melody, None) {
             println!("::: WARNING: Failed to add melody to storage backend ({:?})", err);

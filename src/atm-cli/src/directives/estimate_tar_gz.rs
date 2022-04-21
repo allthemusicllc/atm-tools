@@ -39,7 +39,7 @@ fn estimate_tar_gz_size(
             break;
         }
         // Copy notes into owned melody
-        let melody = melody_ref.iter().map(|n| *n.clone()).collect::<libatm::MIDINoteVec>();
+        let melody = melody_ref.into_iter().copied().collect::<libatm::MIDINoteVec>();
         // Append melody to archive
         archive.append_melody(melody, None).unwrap();
     }
