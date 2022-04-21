@@ -112,8 +112,14 @@ jobs:
               then
                 FILENAME="$(basename ${FILEPATH})"
                 TARBALL_FILENAME="${FILENAME/.exe/}-${{ matrix.target }}.tar.gz"
+                HASH_FILENAME="${TARBALL_FILENAME}.sha256"
+
                 tar -C "./target/${{ matrix.target }}/release" cvzf "${TARBALL_FILENAME}" "${FILENAME}"
+                shasum -a 256 "./target/${{ matrix.target }}/release/${FILENAME}" >> "${HASH_FILENAME}"
+                shasum -a 256 "${TARBALL_FILENAME}" >> "${HASH_FILENAME}"
+
                 gh release upload --clobber "${{ github.ref }}" "${TARBALL_FILENAME}"
+                gh release upload --clobber "${{ github.ref }}" "${HASH_FILENAME}"
               fi
             done
         env:
