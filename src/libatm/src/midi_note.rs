@@ -262,7 +262,7 @@ impl From<MIDINoteSet> for MIDINoteVec {
 impl From<&MIDINoteSet> for MIDINoteVec {
     // Allow conversion from &MIDINoteSet to Vec<MIDINote>
     fn from(set: &MIDINoteSet) -> Self {
-        set.iter().map(|n| n.clone()).collect::<MIDINoteVec>()
+        set.iter().copied().collect::<MIDINoteVec>()
     }
 }
 

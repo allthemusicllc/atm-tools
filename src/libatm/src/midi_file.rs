@@ -182,17 +182,16 @@ impl MIDIFile {
         self.sequence
             .iter()
             .enumerate()
-            .map(|(idx, note)| {
+            .flat_map(|(idx, note)| {
                 let first_status = match idx {
                     0 => MIDIStatus::NoteOn,
                     _ => MIDIStatus::RunningStatus,
                 };
                 vec![
-                    MIDIChannelVoiceMessage::new(0, &note, 0x64, first_status, 0),
-                    MIDIChannelVoiceMessage::new(delta_time, &note, 0, MIDIStatus::RunningStatus, 0),
+                    MIDIChannelVoiceMessage::new(0, note, 0x64, first_status, 0),
+                    MIDIChannelVoiceMessage::new(delta_time, note, 0, MIDIStatus::RunningStatus, 0),
                 ]
             })
-            .flatten()
             .collect::<Vec<MIDIChannelVoiceMessage>>()
     }
 
