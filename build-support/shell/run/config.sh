@@ -17,7 +17,7 @@ RUNTIME_CONTEXT="container"
 # Default container registry to push build container image to
 BUILD_IMAGE_REGISTRY="ghcr.io"
 # URL of the build container image, including the registry hostname and image path
-BUILD_IMAGE_URL="${BUILD_IMAGE_REGISTRY}/libcommon/$(basename $(pwd))"
+BUILD_IMAGE_URL="${BUILD_IMAGE_REGISTRY}/allthemusicllc/$(basename $(pwd))"
 # Tag of the build container image
 BUILD_IMAGE_TAG="build"
 # Target stage of the build container image
