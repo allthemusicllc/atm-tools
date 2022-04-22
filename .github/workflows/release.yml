@@ -9,21 +9,45 @@ name: Compile Release Binaries and Create New Release
 on:
   push:
     tags:
-      # Triggered on creation of tags that follow semver (x.y.z) with 'v' prefix
-      - "v[0-9]+.[0-9]+.[0-9]+"
+      # This repo contains multiple crates, so release tags are of the form <crate>/<version>
+      # where <version> follows semver (x.y.z) with 'v' prefix
+      - "*/v[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
 
+  extract-release-metadata:
+    name: Extract crate name and version from release tag
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Extract crate name and version from release tag
+        id: extract-release-metadata
+        shell: bash
+        run: |
+          set -e
+
+          CRATE_NAME="$(echo ${{ github.ref_name }} | cut -d/ -f1 | tr -d '[:space:]')"
+          echo "::set-output name=crate_name::${CRATE_NAME}"
+          RELEASE_VERSION="$(echo ${{ github.ref_name }} | cut -d/ -f2 | tr -d '[:space:]')"
+          echo "::set-output name=release_version::${RELEASE_VERSION}"
+    outputs:
+      crate_name: "${{ steps.extract-release-metadata.outputs.crate_name }}"
+      release_version: "${{ steps.extract-release-metadata.outputs.release_version }}"
+
   create-github-release:
     name: Create GitHub release
+    needs: extract-release-metadata
     runs-on: ubuntu-latest
     steps:
 
       - name: Create GitHub release
         id: create-release
         run: |
-          echo "::set-output name=release_url::$(gh release create \
-            ${{ github.ref }} --title Release ${{ github.ref }})"
+          echo "::set-output name=release_url::$(\
+            gh release create \
+            ${{ github.ref }} \
+            --title '`${{ needs.extract-release-metadata.outputs.crate_name }}`: Release ${{ needs.extract-release-metadata.outputs.release_version }}'\
+          )"
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
     outputs:
@@ -31,7 +55,9 @@ jobs:
 
   build-release-binaries:
     name: Build release binaries and upload assets
-    needs: create-github-release
+    needs: 
+      - extract-release-metadata
+      - create-github-release
     permissions:
       contents: write
       packages: read
@@ -94,18 +120,18 @@ jobs:
         if: "${{ matrix.os == 'ubuntu-latest' }}"
         shell: bash
         run: |
-          ./run.sh build --target "${{ matrix.target }}" --release
+          ./run.sh build --target "${{ matrix.target }}" -p "${{ needs.extract-release-metadata.outputs.crate_name }}" --release
 
       - name: Compile the package in release mode
         if: "${{ matrix.os == 'macos-latest' }}"
         shell: bash
         run: |
-          ./run.sh --local build --target "${{ matrix.target }}" --release
+          ./run.sh --local build --target "${{ matrix.target }}" -p "${{ needs.extract-release-metadata.outputs.crate_name }}" --release
 
       - name: Upload asset(s) to release
         shell: bash
         run: |
-          find "./target/${{ matrix.target }}/release" -maxdepth 1 -type f \
+          find "./target/${{ matrix.target }}/release" -maxdepth 1 -type f -iregex '.*/${{ needs.extract-release-metadata.outputs.crate_name }}.*' \
             | while read FILEPATH
             do
               if ( [ -f "${FILEPATH}" ] && [ -x "${FILEPATH}" ] )
