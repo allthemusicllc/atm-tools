@@ -147,8 +147,8 @@ jobs:
                 shasum -a 256 "./target/${{ matrix.target }}/release/${FILENAME}" >> "${HASH_FILENAME}"
                 shasum -a 256 "${TARBALL_FILENAME}" >> "${HASH_FILENAME}"
 
-                gh release upload --clobber "${{ github.ref }}" "${TARBALL_FILENAME}"
-                gh release upload --clobber "${{ github.ref }}" "${HASH_FILENAME}"
+                gh release upload --clobber "${{ github.ref_name }}" "${TARBALL_FILENAME}"
+                gh release upload --clobber "${{ github.ref_name }}" "${HASH_FILENAME}"
               fi
             done
         env:
