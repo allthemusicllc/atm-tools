@@ -84,7 +84,7 @@ run-command() {
 ####################
 
 run-build() {
-    run-check
+    run-check "${@}"
 
     run-fmt-check
 
