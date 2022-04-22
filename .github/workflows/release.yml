@@ -100,6 +100,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+        # Inspired by https://github.com/actions/cache/blob/main/examples.md#rust---cargo
+      - name: Configure caching for Rust toolchain
+        if: "${{ matrix.os == 'macos-latest' }}"
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+        key: "${{ runner.os }}-cargo-${{ hashFiles('~/.cargo/registry/index/*/.git/refs/remotes/origin/master') }}"
+
         # Toolchain version and components must match build-support/docker/install-rust.sh
       - name: Install Rust toolchain
         if: "${{ matrix.os == 'macos-latest' }}"
