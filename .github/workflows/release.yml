@@ -110,7 +110,7 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-        key: "${{ runner.os }}-cargo-${{ hashFiles('~/.cargo/registry/index/*/.git/refs/remotes/origin/master') }}"
+          key: "${{ runner.os }}-cargo-${{ hashFiles('~/.cargo/registry/index/*/.git/refs/remotes/origin/master') }}"
 
         # Toolchain version and components must match build-support/docker/install-rust.sh
       - name: Install Rust toolchain
