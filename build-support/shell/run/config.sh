@@ -27,4 +27,4 @@ BUILD_TARGET_STAGE="build"
 USERID="$(id -u)"
 USERNAME="$(id -un)"
 # Docker group GID of host
-DOCKER_GID="$(getent group docker | cut -d: -f3)"
+DOCKER_GID="$( ( getent group docker 2>/dev/null ) | cut -d: -f3 )"
