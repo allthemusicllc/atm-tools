@@ -67,8 +67,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-latest
-            target: aarch64-apple-darwin
+          # TODO: Test build locally on macOS before re-enabling
+          # Semantics of variable substitution/sed/grep in Bash on macOS appear to be different
+          # - os: macos-latest
+          #   target: aarch64-apple-darwin
           - os: macos-latest
             target: x86_64-apple-darwin
           - os: ubuntu-latest
