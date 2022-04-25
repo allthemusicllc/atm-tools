@@ -135,18 +135,18 @@ jobs:
         if: "${{ matrix.os == 'ubuntu-latest' }}"
         shell: bash
         run: |
-          ./run.sh build --target "${{ matrix.target }}" -p "${{ needs.extract-release-metadata.outputs.crate_name }}" --release
+          ./run.sh build --target "${{ matrix.target }}" -p "${{ needs.extract-release-metadata.outputs.crate_name }}" --profile release-fat-lto
 
       - name: Compile the package in release mode
         if: "${{ matrix.os == 'macos-latest' }}"
         shell: bash
         run: |
-          ./run.sh --local build --target "${{ matrix.target }}" -p "${{ needs.extract-release-metadata.outputs.crate_name }}" --release
+          ./run.sh --local build --target "${{ matrix.target }}" -p "${{ needs.extract-release-metadata.outputs.crate_name }}" --profile release-fat-lto
 
       - name: Upload asset(s) to release
         shell: bash
         run: |
-          find "./target/${{ matrix.target }}/release" -maxdepth 1 -type f -iregex '.*/${{ needs.extract-release-metadata.outputs.crate_name }}.*' \
+          find "./target/${{ matrix.target }}/release-fat-lto" -maxdepth 1 -type f -iregex '.*/${{ needs.extract-release-metadata.outputs.crate_name }}.*' \
             | while read FILEPATH
             do
               if ( [ -f "${FILEPATH}" ] && [ -x "${FILEPATH}" ] )
@@ -155,9 +155,9 @@ jobs:
                 TARBALL_FILENAME="${FILENAME/.exe/}-${{ matrix.target }}.tar.gz"
                 HASH_FILENAME="${TARBALL_FILENAME}.sha256"
 
-                tar cvzf "${TARBALL_FILENAME}" -C "./target/${{ matrix.target }}/release" "${FILENAME}"
+                tar cvzf "${TARBALL_FILENAME}" -C "./target/${{ matrix.target }}/release-fat-lto" "${FILENAME}"
                 # Removing path prefix from shasum output to make verifying with `shasum -a 256 -c` after download easier
-                shasum -a 256 "./target/${{ matrix.target }}/release/${FILENAME}" | sed 's/\.\/target\/${{ matrix.target }}\/release\///g' >> "${HASH_FILENAME}"
+                shasum -a 256 "./target/${{ matrix.target }}/release-fat-lto/${FILENAME}" | sed 's/\.\/target\/${{ matrix.target }}\/release-fat-lto///g' >> "${HASH_FILENAME}"
                 shasum -a 256 "${TARBALL_FILENAME}" >> "${HASH_FILENAME}"
 
                 gh release upload --clobber "${{ github.ref_name }}" "${TARBALL_FILENAME}"
