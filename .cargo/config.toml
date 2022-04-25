@@ -1,0 +1,3 @@
+# Statically link C runtime on Windows targets
+[target.'cfg(target_arch = "windows")']
+rustflags = ["-C", "target-feature=+crt-static"]
