@@ -1,0 +1,19 @@
+[package]
+name = "tarsplit"
+version = "0.1.0"
+authors = ["All The Music LLC <make.allthemusic@protonmail.com>"]
+edition = "2018"
+
+homepage = "https://allthemusic.info"
+license = "CC-BY-4.0"
+readme = "README.md"
+repository = "https://github.com/allthemusicllc/atm-tools"
+
+[dependencies]
+clap = "2.33.0"
+tar = "0.4.38"
+flate2 = "1.0.23"
+
+[dev-dependencies]
+galvanic-assert = "0.8.7"
+galvanic-test = "0.2.0"

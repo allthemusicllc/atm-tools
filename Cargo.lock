@@ -135,6 +135,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "galvanic-assert"
+version = "0.8.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3afb916c829538b4f18402c9d0be7484a6f5539442e19ed67ddfb7782604bb40"
+
+[[package]]
+name = "galvanic-test"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6e6ec93b2f388dcd1102437036da399ae305e9c6cdd4e213260f5ddb6005907a"
+
+[[package]]
 name = "heck"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -309,6 +321,17 @@ dependencies = [
  "filetime",
  "libc",
  "xattr",
+]
+
+[[package]]
+name = "tarsplit"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "flate2",
+ "galvanic-assert",
+ "galvanic-test",
+ "tar",
 ]
 
 [[package]]
