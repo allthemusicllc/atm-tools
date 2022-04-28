@@ -4,13 +4,15 @@ version: 2
 # for Dependabot config documentation
 updates:
 
-    # Project dependencies
+    # atm-cli crate dependencies
   - package-ecosystem: "cargo"
-    # Directory containing Cargo.toml and Cargo.lock files
-    directory: "/"
-    # Schedule to run Dependabot
-    # Change the interval to "daily" for important projects
-    # with larger user bases
+    directory: "/src/atm-cli/"
+    schedule:
+      interval: "weekly"
+
+    # libatm crate dependencies
+  - package-ecosystem: "cargo"
+    directory: "/src/libatm/"
     schedule:
       interval: "weekly"
 
