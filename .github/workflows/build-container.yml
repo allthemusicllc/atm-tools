@@ -1,7 +1,7 @@
 name: Build and Push Build Container
 on:
   pull_request:
-    branches:
+s    branches:
       - "build-support/docker/**"
     types:
       - closed
