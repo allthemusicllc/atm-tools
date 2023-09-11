@@ -41,7 +41,7 @@ jobs:
     steps:
 
       - name: Checkout the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Create GitHub release
         id: create-release
@@ -86,7 +86,7 @@ jobs:
     steps:
 
       - name: Checkout the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Docker (BuildX)
         if: "${{ matrix.os == 'ubuntu-latest' }}"
